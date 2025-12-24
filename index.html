@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الصرف التفاعلي - الصف الأول الثانوي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --correct-color: #27ae60;
+            --wrong-color: #c0392b;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        /* نافذة معلومات المالك */
+        .owner-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+        }
+        
+        .owner-modal.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .owner-modal-content {
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: scale(1);
+            transition: transform 0.5s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .owner-modal.fade-out .owner-modal-content {
+            transform: scale(0.8);
+        }
+        
+        .owner-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            color: #f1c40f;
+        }
+        
+        .owner-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+        
+        .owner-info {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .owner-name {
+            color: #f1c40f;
+            font-weight: bold;
+            font-size: 1.4rem;
+            display: block;
+            margin-top: 10px;
+        }
+        
+        .countdown {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 15px;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            padding: 30px;
+            position: relative;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--light-color);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        .subtitle {
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+        }
+        
+        .info-box {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-right: 5px solid var(--secondary-color);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .info-box:hover {
+            transform: translateY(-3px);
+        }
+        
+        .info-box h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-box p {
+            margin-bottom: 10px;
+        }
+        
+        .level-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: var(--light-color);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        
+        .level {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: var(--transition);
+        }
+        
+        .level.easy {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .level.medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .level.hard {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .progress-container {
+            margin-bottom: 30px;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background-color: var(--light-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #27ae60, #3498db);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        
+        .question-container {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: none;
+        }
+        
+        .question-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .question-number {
+            background-color: var(--secondary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .option:hover {
+            border-color: var(--secondary-color);
+            background-color: #f0f8ff;
+            transform: translateX(5px);
+        }
+        
+        .option.selected {
+            border-color: var(--secondary-color);
+            background-color: #e3f2fd;
+        }
+        
+        .option.correct {
+            border-color: var(--correct-color);
+            background-color: #d4edda;
+        }
+        
+        .option.wrong {
+            border-color: var(--wrong-color);
+            background-color: #f8d7da;
+        }
+        
+        .option.disabled {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
+        .option-letter {
+            background-color: var(--light-color);
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .buttons-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-primary:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #7f8c8d;
+        }
+        
+        .btn-secondary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-success {
+            background-color: var(--correct-color);
+            color: white;
+        }
+        
+        .btn-success:hover:not(:disabled) {
+            background-color: #219653;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-success:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .results-container {
+            display: none;
+            padding: 30px;
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .results-container.active {
+            display: block;
+        }
+        
+        .results-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+        
+        .results-icon.success {
+            color: var(--correct-color);
+        }
+        
+        .results-icon.warning {
+            color: #f39c12;
+        }
+        
+        .results-icon.error {
+            color: var(--wrong-color);
+        }
+        
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(var(--secondary-color) 0% 0%, #ecf0f1 0% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            position: relative;
+            box-shadow: var(--shadow);
+        }
+        
+        .score-inner {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .score-percent {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .score-text {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .results-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .result-item {
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .result-item.correct {
+            border-right: 5px solid var(--correct-color);
+        }
+        
+        .result-item.wrong {
+            border-right: 5px solid var(--wrong-color);
+        }
+        
+        .corrections-container {
+            text-align: right;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .corrections-container.active {
+            display: block;
+        }
+        
+        .correction-item {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-right: 5px solid #f39c12;
+        }
+        
+        .question-correction {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .correct-answer {
+            color: var(--correct-color);
+            font-weight: bold;
+        }
+        
+        .explanation {
+            color: #666;
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .answer-message {
+            background-color: #f0f8ff;
+            border-right: 4px solid var(--secondary-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .answer-message.show {
+            display: flex;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .results-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                justify-content: center;
+            }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f1c40f;
+            border-radius: 50%;
+            opacity: 0;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- نافذة معلومات المالك -->
+    <div class="owner-modal" id="ownerModal">
+        <div class="owner-modal-content">
+            <div class="owner-icon">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <h2 class="owner-title">معلومات الموقع</h2>
+            <div class="owner-info">
+                <p>هذا الموقع تابع لـ:</p>
+                <span class="owner-name">Youssef</span>
+                <p style="margin-top: 15px; font-size: 1rem;">يتم إغلاق هذه النافذة تلقائيًا خلال <span id="countdown">5</span> ثوانٍ</p>
+            </div>
+            <div class="countdown">
+                <i class="fas fa-info-circle"></i> يمكنك النقر خارج النافذة لإغلاقها الآن
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h2><i class="fas fa-book-open"></i> اختبار الصرف التفاعلي</h2>
+            <p class="subtitle">الصرف By Youssef</p>
+        </header>
+        
+        <div class="level-indicator">
+            <div class="level easy">أسئلة سهلة</div>
+            <div class="level medium">أسئلة متوسطة</div>
+            <div class="level hard">أسئلة صعبة</div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="progress-text">
+                <span>التقدم: <span id="current-question">0</span>/20</span>
+                <span id="progress-percent">0%</span>
+            </div>
+        </div>
+        
+        <!-- منطقة الأسئلة -->
+        <div id="questions-area">
+            <!-- سيتم إنشاء الأسئلة هنا بواسطة JavaScript -->
+        </div>
+        
+        <div class="answer-message" id="answer-message">
+            <i class="fas fa-check-circle"></i>
+            <span>تم اختيار إجابة. يمكنك الآن الانتقال إلى السؤال التالي.</span>
+        </div>
+        
+        <div class="buttons-container">
+            <button class="btn btn-secondary" id="prev-btn" disabled>
+                <i class="fas fa-arrow-right"></i> السابق
+            </button>
+            <button class="btn btn-primary" id="next-btn" disabled>
+                التالي <i class="fas fa-arrow-left"></i>
+            </button>
+            <button class="btn btn-success" id="submit-btn" style="display: none;" disabled>
+                <i class="fas fa-paper-plane"></i> إنهاء الاختبار وعرض النتيجة
+            </button>
+        </div>
+        
+        <!-- منطقة النتائج -->
+        <div class="results-container" id="results-container">
+            <div class="results-icon success" id="results-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h2 id="results-title">نتيجة الاختبار</h2>
+            <p id="results-message">لقد أنهيت الاختبار بنجاح! إليك نتيجتك:</p>
+            
+            <div class="score-circle" id="score-circle">
+                <div class="score-inner">
+                    <div class="score-percent" id="score-percent">0%</div>
+                    <div class="score-text" id="score-text">0/20</div>
+                </div>
+            </div>
+            
+            <div class="results-details" id="results-details">
+                <!-- سيتم ملء التفاصيل هنا بواسطة JavaScript -->
+            </div>
+            
+            <button class="btn btn-primary" id="show-corrections-btn">
+                <i class="fas fa-check-circle"></i> عرض التصحيحات
+            </button>
+            <button class="btn btn-secondary" id="restart-btn">
+                <i class="fas fa-redo"></i> إعادة الاختبار
+            </button>
+        </div>
+        
+        <!-- منطقة التصحيحات -->
+        <div class="corrections-container" id="corrections-container">
+            <h3><i class="fas fa-check-double"></i> التصحيحات</h3>
+            <p>فيما يلي تصحيح للأسئلة التي أخطأت فيها:</p>
+            <div id="corrections-list">
+                <!-- سيتم ملء التصحيحات هنا بواسطة JavaScript -->
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>By</p>
+            <p>Youssef</p>
+        </div>
+    </div>
+
+    <script>
+        // كود نافذة المالك
+        document.addEventListener('DOMContentLoaded', function() {
+            const ownerModal = document.getElementById('ownerModal');
+            const countdownElement = document.getElementById('countdown');
+            let countdown = 5;
+            
+            // تحديث العداد كل ثانية
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    closeOwnerModal();
+                }
+            }, 1000);
+            
+            // إغلاق النافذة بعد 3 ثوانٍ
+            setTimeout(() => {
+                closeOwnerModal();
+            }, 5000);
+            
+            // إغلاق النافذة عند النقر خارجها
+            ownerModal.addEventListener('click', function(e) {
+                if (e.target === ownerModal) {
+                    closeOwnerModal();
+                    clearInterval(countdownInterval);
+                }
+            });
+            
+            // دالة لإغلاق النافذة بتأثير التلاشي
+            function closeOwnerModal() {
+                ownerModal.classList.add('fade-out');
+                
+                // إزالة النافذة من DOM بعد انتهاء التأثير
+                setTimeout(() => {
+                    ownerModal.style.display = 'none';
+                }, 800);
+            }
+        });
+
+        // بنك الأسئلة الجديدة (مستبدلة بالأسئلة من الصورة)
+        const questions = [
+            {
+                id: 1,
+                level: 1,
+                question: "Implementing security at the internet gateway can block ...... email and sites.",
+                options: [
+                    "pushing",
+                    "punishing",
+                    "phishing",
+                    "pinching"
+                ],
+                correctAnswer: 2,
+                explanation: "الإجابة الصحيحة هي 'phishing' لأنه يشير إلى رسائل البريد الإلكتروني والمواقع التصيدية التي تهدف لسرقة المعلومات."
+            },
+            {
+                id: 2,
+                level: 1,
+                question: "Muslims perform Hajj hoping for .....",
+                options: [
+                    "stronger faith",
+                    "forgiveness",
+                    "a fresh start",
+                    "all the previous"
+                ],
+                correctAnswer: 1,
+                explanation: "Muslims perform Hajj hoping for forgiveness"
+            },
+            {
+                id: 3,
+                level: 1,
+                question: "The future of our planet is in ...... if we continue to plunder it as we do.",
+                options: [
+                    "dam",
+                    "danger",
+                    "dangerous",
+                    "dangerously"
+                ],
+                correctAnswer: 1,
+                explanation: "الإجابة الصحيحة هي 'danger' لأنها تعبر عن الخطر الذي يهدد كوكبنا."
+            },
+            {
+                id: 4,
+                level: 1,
+                question: "I was expecting him to be ...... but he was very restrained.",
+                options: [
+                    "pleased",
+                    "furious",
+                    "glad",
+                    "happy"
+                ],
+                correctAnswer: 1,
+                explanation: "الإجابة الصحيحة هي 'furious' لأنها تعبر عن الغضب الشديد الذي كان متوقعاً منه."
+            },
+            {
+                id: 5,
+                level: 1,
+                question: "Viewers will decide ...... who best coped with conditions and follow competitors.",
+                options: [
+                    "with",
+                    "on",
+                    "to",
+                    "that"
+                ],
+                correctAnswer: 1,
+                explanation: "الإجابة الصحيحة هي 'on' لأنها تتبع الفعل decide بحرف الجر المناسب."
+            },
+            {
+                id: 6,
+                level: 2,
+                question: "I love ...... films and I enjoy reading deductive stories too.",
+                options: [
+                    "adventurer",
+                    "adventure",
+                    "adventurous",
+                    "adventurously"
+                ],
+                correctAnswer: 2,
+                explanation: "الإجابة الصحيحة هي 'adventurous' لأنها صفة تناسب وصف الأفلام."
+            },
+            {
+                id: 7,
+                level: 2,
+                question: "I want you to choose a story or poem by Stevenson and bring it to class to ...... .",
+                options: [
+                    "discuss",
+                    "rule",
+                    "role",
+                    "punish"
+                ],
+                correctAnswer: 0,
+                explanation: "الإجابة الصحيحة هي 'discuss' لأنها الفعل المناسب لسياق النقاش في الصف."
+            },
+            {
+                id: 8,
+                level: 2,
+                question: "Prayer is the ..... pillar of islam",
+                options: [
+                    "third",
+                    "second",
+                    "fourth",
+                    "first"
+                ],
+                correctAnswer: 1,
+                explanation: "Prayer is the second pillar of islam."
+            },
+            {
+                id: 9,
+                level: 2,
+                question: "Fasting is the ..... pillar of islam.",
+                options: [
+                    "third",
+                    "first",
+                    "second",
+                    "fourth"
+                ],
+                correctAnswer: 3,
+                explanation: "Fasting is the fourth pillar of islam."
+            },
+            {
+                id: 10,
+                level: 2,
+                question: "Responsibility, I ...... , is what defines adulthood.",
+                options: [
+                    "respond",
+                    "suppose",
+                    "kidnap",
+                    "publish"
+                ],
+                correctAnswer: 1,
+                explanation: "الإجابة الصحيحة هي 'suppose' لأنها تعبر عن الرأي أو الاعتقاد."
+            },
+            {
+                id: 11,
+                level: 3,
+                question: "Wealth is ..... by paying (Zaka).",
+                options: [
+                    "qualified",
+                    "purified",
+                    "testified",
+                    "modified"
+                ],
+                correctAnswer: 1,
+                explanation: "Wealth is purified by paying (Zaka)."
+            },
+            {
+                id: 12,
+                level: 3,
+                question: "This disease doesn't generally ...... to treatment.",
+                options: [
+                    "kidnap",
+                    "publish",
+                    "respond",
+                    "rule"
+                ],
+                correctAnswer: 2,
+                explanation: "الإجابة الصحيحة هي 'respond' لأنها تشير إلى استجابة المرض للعلاج."
+            },
+            {
+                id: 13,
+                level: 3,
+                question: "His collected ...... were published in 1928.",
+                options: [
+                    "playwrights",
+                    "poets",
+                    "poems",
+                    "authors"
+                ],
+                correctAnswer: 2,
+                explanation: "الإجابة الصحيحة هي 'poems' لأنها تشير إلى القصائد المجمعة التي تم نشرها."
+            },
+            {
+                id: 14,
+                level: 3,
+                question: "Grammatical ...... prescribe how words may be used together.",
+                options: [
+                    "rollers",
+                    "rules",
+                    "roles",
+                    "rolls"
+                ],
+                correctAnswer: 1,
+                explanation: "الإجابة الصحيحة هي 'rules' لأنها تشير إلى القواعد النحوية."
+            },
+            {
+                id: 15,
+                level: 3,
+                question: "This particular stretch of coast is ...... popular with walkers.",
+                options: [
+                    "private",
+                    "especial",
+                    "especially",
+                    "special"
+                ],
+                correctAnswer: 2,
+                explanation: "الإجابة الصحيحة هي 'especially' لأنها ظرف يدل على الشعبية الكبيرة بشكل خاص."
+            },
+            {
+                id: 16,
+                level: 3,
+                question: "The farmer used a big ...... to keep the water which he gave to his goats.",
+                options: [
+                    "purse",
+                    "crutch",
+                    "gravel",
+                    "barrel"
+                ],
+                correctAnswer: 3,
+                explanation: "الإجابة الصحيحة هي 'barrel' لأنها تشير إلى البرميل الكبير لحفظ الماء."
+            },
+            {
+                id: 17,
+                level: 3,
+                question: "Recitation of (Shahada) marks ..... to islam.",
+                options: [
+                    "embracing",
+                    "convenient",
+                    "avoiding",
+                    "inversion"
+                ],
+                correctAnswer: 1,
+                explanation: "Recitation of (Shahada) marks convenient to islam."
+            },
+            {
+                id: 18,
+                level: 3,
+                question: "Although they cannot see, ...... people can often hear better than other people.",
+                options: [
+                    "deaf",
+                    "blind",
+                    "rich",
+                    "abled"
+                ],
+                correctAnswer: 1,
+                explanation: "الإجابة الصحيحة هي 'blind' لأنها تشير إلى الأشخاص المكفوفين الذين لا يستطيعون الرؤية."
+            },
+            {
+                id: 19,
+                level: 3,
+                question: "The ship ...... helped each other to control the situation well.",
+                options: [
+                    "gang",
+                    "staff",
+                    "crew",
+                    "team"
+                ],
+                correctAnswer: 2,
+                explanation: "الإجابة الصحيحة هي 'crew' لأنها تشير إلى طاقم السفينة الذين يعملون معاً."
+            },
+            {
+                id: 20,
+                level: 3,
+                question: "A ...... is a group of people who work against the law.",
+                options: [
+                    "gang",
+                    "crew",
+                    "staff",
+                    "team"
+                ],
+                correctAnswer: 0,
+                explanation: "الإجابة الصحيحة هي 'gang' لأنها تشير إلى مجموعة تعمل ضد القانون."
+            }
+        ];
+
+        // العناصر الرئيسية في DOM
+        const questionsArea = document.getElementById('questions-area');
+        const progressBar = document.getElementById('progress');
+        const currentQuestionElement = document.getElementById('current-question');
+        const progressPercent = document.getElementById('progress-percent');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const resultsContainer = document.getElementById('results-container');
+        const scoreCircle = document.getElementById('score-circle');
+        const scorePercent = document.getElementById('score-percent');
+        const scoreText = document.getElementById('score-text');
+        const resultsTitle = document.getElementById('results-title');
+        const resultsMessage = document.getElementById('results-message');
+        const resultsIcon = document.getElementById('results-icon');
+        const resultsDetails = document.getElementById('results-details');
+        const correctionsContainer = document.getElementById('corrections-container');
+        const correctionsList = document.getElementById('corrections-list');
+        const showCorrectionsBtn = document.getElementById('show-corrections-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const answerMessage = document.getElementById('answer-message');
+
+        // متغيرات التطبيق
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let shuffledQuestions = [];
+        let score = 0;
+
+        // تهيئة التطبيق
+        function initApp() {
+            // خلط الأسئلة عشوائياً
+            shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+            
+            // خلط الخيارات داخل كل سؤال
+            shuffledQuestions.forEach(q => {
+                // حفظ الإجابة الصحيحة قبل الخلط
+                const correctAnswerText = q.options[q.correctAnswer];
+                
+                // خلط الخيارات
+                const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+                
+                // تحديث الإجابة الصحيحة بعد الخلط
+                q.correctAnswer = shuffledOptions.indexOf(correctAnswerText);
+                q.options = shuffledOptions;
+            });
+            
+            // إنشاء عناصر الأسئلة في واجهة المستخدم
+            createQuestionElements();
+            
+            // عرض السؤال الأول
+            showQuestion(currentQuestionIndex);
+            
+            // تحديث شريط التقدم
+            updateProgressBar();
+            
+            // تحديث حالة الأزرار
+            updateButtonsState();
+            
+            // إضافة المستمعين للأحداث
+            addEventListeners();
+        }
+
+        // إنشاء عناصر الأسئلة في DOM
+        function createQuestionElements() {
+            shuffledQuestions.forEach((question, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question-container';
+                questionElement.id = `question-${index}`;
+                
+                // إضافة رقم السؤال
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = index + 1;
+                
+                // إضافة نص السؤال
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = question.question;
+                
+                // إضافة مؤشر مستوى الصعوبة
+                const levelIndicator = document.createElement('div');
+                levelIndicator.className = 'level-indicator';
+                levelIndicator.innerHTML = `
+                    <span class="level ${getLevelClass(question.level)}">${getLevelText(question.level)}</span>
+                `;
+                
+                // إضافة حاوية الخيارات
+                const optionsContainer = document.createElement('div');
+                optionsContainer.className = 'options-container';
+                
+                // إضافة الخيارات
+                question.options.forEach((option, optionIndex) => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'option';
+                    optionElement.dataset.optionIndex = optionIndex;
+                    
+                    // إذا كان السؤال قد تمت الإجابة عليه، تعطيل الخيار
+                    if (userAnswers[index] !== null) {
+                        optionElement.classList.add('disabled');
+                    }
+                    
+                    const optionLetter = document.createElement('div');
+                    optionLetter.className = 'option-letter';
+                    optionLetter.textContent = String.fromCharCode(0x0627 + optionIndex); // أحرف عربية
+                    
+                    const optionText = document.createElement('div');
+                    optionText.className = 'option-text';
+                    optionText.textContent = option;
+                    
+                    optionElement.appendChild(optionLetter);
+                    optionElement.appendChild(optionText);
+                    
+                    // إضافة مستمع حدث النقر
+                    optionElement.addEventListener('click', () => selectOption(index, optionIndex));
+                    
+                    optionsContainer.appendChild(optionElement);
+                });
+                
+                // تجميع جميع العناصر
+                questionElement.appendChild(questionNumber);
+                questionElement.appendChild(questionText);
+                questionElement.appendChild(levelIndicator);
+                questionElement.appendChild(optionsContainer);
+                
+                questionsArea.appendChild(questionElement);
+            });
+        }
+
+        // الحصول على نص مستوى الصعوبة
+        function getLevelText(level) {
+            switch(level) {
+                case 1: return 'سهل';
+                case 2: return 'متوسط';
+                case 3: return 'صعب';
+                default: return 'غير محدد';
+            }
+        }
+
+        // الحصول على كلاس مستوى الصعوبة
+        function getLevelClass(level) {
+            switch(level) {
+                case 1: return 'easy';
+                case 2: return 'medium';
+                case 3: return 'hard';
+                default: return '';
+            }
+        }
+
+        // عرض سؤال معين
+        function showQuestion(index) {
+            // إخفاء جميع الأسئلة
+            document.querySelectorAll('.question-container').forEach(q => {
+                q.classList.remove('active');
+            });
+            
+            // عرض السؤال الحالي
+            document.getElementById(`question-${index}`).classList.add('active');
+            
+            // إخفاء رسالة الإجابة
+            answerMessage.classList.remove('show');
+            
+            // تحديث حالة الأزرار
+            updateButtonsState();
+            
+            // تحديث شريط التقدم
+            updateProgressBar();
+            
+            // إذا كان السؤال الحالي قد تم الإجابة عليه، تلوين الخيار المختار وتعطيل الخيارات
+            if (userAnswers[currentQuestionIndex] !== null) {
+                const options = document.querySelectorAll(`#question-${currentQuestionIndex} .option`);
+                options.forEach(option => {
+                    option.classList.remove('selected');
+                    option.classList.add('disabled'); // تعطيل الخيارات
+                    if (parseInt(option.dataset.optionIndex) === userAnswers[currentQuestionIndex]) {
+                        option.classList.add('selected');
+                    }
+                });
+            } else {
+                // إذا لم يتم الإجابة بعد، إزالة حالة التعطيل
+                const options = document.querySelectorAll(`#question-${currentQuestionIndex} .option`);
+                options.forEach(option => {
+                    option.classList.remove('disabled');
+                });
+            }
+            
+            // تحديث حالة الخيارات في الأسئلة السابقة لتكون معطلة دائماً
+            for (let i = 0; i < currentQuestionIndex; i++) {
+                if (userAnswers[i] !== null) {
+                    const prevOptions = document.querySelectorAll(`#question-${i} .option`);
+                    prevOptions.forEach(option => {
+                        option.classList.add('disabled');
+                    });
+                }
+            }
+        }
+
+        // تحديث حالة أزرار التصفح
+        function updateButtonsState() {
+            // زر السابق
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            // التحقق مما إذا كان السؤال الحالي قد تمت الإجابة عليه
+            const isCurrentQuestionAnswered = userAnswers[currentQuestionIndex] !== null;
+            
+            // زر التالي
+            if (currentQuestionIndex === shuffledQuestions.length - 1) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'flex';
+                submitBtn.disabled = !isCurrentQuestionAnswered;
+            } else {
+                nextBtn.style.display = 'flex';
+                submitBtn.style.display = 'none';
+                nextBtn.disabled = !isCurrentQuestionAnswered;
+            }
+        }
+
+        // تحديث شريط التقدم
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            currentQuestionElement.textContent = currentQuestionIndex + 1;
+            progressPercent.textContent = `${Math.round(progress)}%`;
+        }
+
+        // اختيار خيار للإجابة - معدل لمنع تغيير إجابات الأسئلة السابقة
+        function selectOption(questionIndex, optionIndex) {
+            // منع تغيير الإجابة إذا كان السؤال ليس هو السؤال الحالي أو تمت الإجابة عليه مسبقًا
+            if (questionIndex !== currentQuestionIndex || userAnswers[questionIndex] !== null) {
+                return;
+            }
+            
+            // تحديث إجابة المستخدم
+            userAnswers[questionIndex] = optionIndex;
+            
+            // إضافة تأثير النبض
+            const selectedOption = document.querySelector(`#question-${questionIndex} .option[data-option-index="${optionIndex}"]`);
+            selectedOption.classList.add('pulse-animation');
+            setTimeout(() => {
+                selectedOption.classList.remove('pulse-animation');
+            }, 500);
+            
+            // تحديث الواجهة للسؤال الحالي
+            if (questionIndex === currentQuestionIndex) {
+                const options = document.querySelectorAll(`#question-${questionIndex} .option`);
+                options.forEach(option => {
+                    option.classList.remove('selected');
+                    if (parseInt(option.dataset.optionIndex) === optionIndex) {
+                        option.classList.add('selected');
+                    }
+                });
+                
+                // عرض رسالة الإجابة
+                answerMessage.classList.add('show');
+                
+                // تعطيل جميع الخيارات في هذا السؤال بعد الإجابة
+                options.forEach(option => {
+                    option.classList.add('disabled');
+                });
+                
+                // تحديث حالة الأزرار
+                updateButtonsState();
+            }
+        }
+
+        // الانتقال إلى السؤال التالي
+        function goToNextQuestion() {
+            // التحقق مما إذا كان السؤال الحالي قد تمت الإجابة عليه
+            if (userAnswers[currentQuestionIndex] === null) {
+                // إذا لم تتم الإجابة، عرض تنبيه
+                showAlert("يجب الإجابة على السؤال الحالي قبل الانتقال إلى السؤال التالي");
+                return;
+            }
+            
+            // تعطيل خيارات السؤال الحالي بعد الإجابة عليه
+            const currentOptions = document.querySelectorAll(`#question-${currentQuestionIndex} .option`);
+            currentOptions.forEach(option => {
+                option.classList.add('disabled');
+            });
+            
+            if (currentQuestionIndex < shuffledQuestions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion(currentQuestionIndex);
+            }
+        }
+
+        // الانتقال إلى السؤال السابق
+        function goToPrevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion(currentQuestionIndex);
+            }
+        }
+
+        // عرض تنبيه
+        function showAlert(message) {
+            // إنشاء عنصر التنبيه
+            const alertElement = document.createElement('div');
+            alertElement.className = 'answer-message';
+            alertElement.style.backgroundColor = '#f8d7da';
+            alertElement.style.borderRightColor = '#c0392b';
+            alertElement.style.color = '#721c24';
+            alertElement.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>${message}</span>`;
+            
+            // إضافة التنبيه إلى الصفحة
+            const container = document.querySelector('.container');
+            container.insertBefore(alertElement, questionsArea.nextSibling);
+            
+            // إظهار التنبيه
+            setTimeout(() => {
+                alertElement.classList.add('show');
+            }, 10);
+            
+            // إخفاء التنبيه بعد 3 ثوان
+            setTimeout(() => {
+                alertElement.classList.remove('show');
+                setTimeout(() => {
+                    alertElement.remove();
+                }, 500);
+            }, 3000);
+        }
+
+        // تقديم الاختبار وعرض النتائج
+        function submitTest() {
+            // التحقق مما إذا كان السؤال الأخير قد تمت الإجابة عليه
+            if (userAnswers[shuffledQuestions.length - 1] === null) {
+                showAlert("يجب الإجابة على السؤال الأخير قبل إنهاء الاختبار");
+                return;
+            }
+            
+            // حساب النتيجة
+            score = 0;
+            const wrongAnswers = [];
+            
+            shuffledQuestions.forEach((question, index) => {
+                if (userAnswers[index] === question.correctAnswer) {
+                    score++;
+                } else {
+                    wrongAnswers.push({
+                        questionIndex: index,
+                        question: question.question,
+                        userAnswer: question.options[userAnswers[index]] || 'لم يتم الإجابة',
+                        correctAnswer: question.options[question.correctAnswer],
+                        explanation: question.explanation
+                    });
+                }
+            });
+            
+            // حساب النسبة المئوية
+            const percentage = Math.round((score / shuffledQuestions.length) * 100);
+            
+            // تحديث النتائج في الواجهة
+            updateResults(percentage, wrongAnswers);
+            
+            // إظهار منطقة النتائج وإخفاء منطقة الأسئلة
+            document.getElementById('questions-area').style.display = 'none';
+            document.querySelector('.buttons-container').style.display = 'none';
+            document.querySelector('.progress-container').style.display = 'none';
+            document.querySelector('.level-indicator').style.display = 'none';
+            answerMessage.style.display = 'none';
+            
+            resultsContainer.classList.add('active');
+            
+            // عرض المؤثرات البصرية بناءً على النتيجة
+            showVisualEffects(percentage);
+        }
+
+        // تحديث عرض النتائج
+        function updateResults(percentage, wrongAnswers) {
+            // تحديث النسبة والنص
+            scorePercent.textContent = `${percentage}%`;
+            scoreText.textContent = `${score}/${shuffledQuestions.length}`;
+            
+            // تحديث شريط التقدم الدائري
+            const degree = (percentage / 100) * 360;
+            scoreCircle.style.background = `conic-gradient(var(--secondary-color) 0deg ${degree}deg, #ecf0f1 ${degree}deg 360deg)`;
+            
+            // تحديث العنوان والرسالة بناءً على النتيجة
+            if (percentage >= 80) {
+                resultsTitle.textContent = "ممتاز!";
+                resultsMessage.textContent = "أحسنت! لديك معرفة قوية باللغة الإنجليزية.";
+                resultsIcon.innerHTML = '<i class="fas fa-trophy"></i>';
+                resultsIcon.className = "results-icon success";
+            } else if (percentage >= 60) {
+                resultsTitle.textContent = "جيد جداً";
+                resultsMessage.textContent = "أداء جيد، لكن هناك بعض النقاط التي تحتاج إلى تحسين.";
+                resultsIcon.innerHTML = '<i class="fas fa-star"></i>';
+                resultsIcon.className = "results-icon warning";
+            } else if (percentage >= 40) {
+                resultsTitle.textContent = "مقبول";
+                resultsMessage.textContent = "يجب مراجعة اللغة الإنجليزية بشكل أفضل.";
+                resultsIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                resultsIcon.className = "results-icon warning";
+            } else {
+                resultsTitle.textContent = "يحتاج إلى تحسين";
+                resultsMessage.textContent = "يجب التركيز أكثر على دراسة اللغة الإنجليزية.";
+                resultsIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                resultsIcon.className = "results-icon error";
+            }
+            
+            // تحديث تفاصيل النتائج
+            updateResultsDetails(wrongAnswers);
+            
+            // تحديث قائمة التصحيحات
+            updateCorrectionsList(wrongAnswers);
+        }
+
+        // تحديث تفاصيل النتائج
+        function updateResultsDetails(wrongAnswers) {
+            resultsDetails.innerHTML = `
+                <div class="result-item correct">
+                    <h4><i class="fas fa-check-circle"></i> الإجابات الصحيحة</h4>
+                    <p class="result-count">${score}</p>
+                    <p>سؤال</p>
+                </div>
+                <div class="result-item wrong">
+                    <h4><i class="fas fa-times-circle"></i> الإجابات الخاطئة</h4>
+                    <p class="result-count">${wrongAnswers.length}</p>
+                    <p>سؤال</p>
+                </div>
+                <div class="result-item">
+                    <h4><i class="fas fa-chart-line"></i> النسبة المئوية</h4>
+                    <p class="result-count">${Math.round((score / shuffledQuestions.length) * 100)}%</p>
+                    <p>من إجمالي الأسئلة</p>
+                </div>
+                <div class="result-item">
+                    <h4><i class="fas fa-graduation-cap"></i> المستوى</h4>
+                    <p class="result-count">${getPerformanceLevel(score)}</p>
+                    <p>أداء عام</p>
+                </div>
+            `;
+        }
+
+        // الحصول على مستوى الأداء
+        function getPerformanceLevel(score) {
+            if (score >= 18) return "ممتاز";
+            if (score >= 15) return "جيد جداً";
+            if (score >= 12) return "جيد";
+            if (score >= 9) return "متوسط";
+            return "ضعيف";
+        }
+
+        // تحديث قائمة التصحيحات
+        function updateCorrectionsList(wrongAnswers) {
+            if (wrongAnswers.length === 0) {
+                correctionsList.innerHTML = `
+                    <div class="correction-item">
+                        <p>لا توجد أخطاء تحتاج إلى تصحيح! أحسنت!</p>
+                    </div>
+                `;
+                showCorrectionsBtn.style.display = 'none';
+                return;
+            }
+            
+            correctionsList.innerHTML = '';
+            
+            wrongAnswers.forEach((wrong, index) => {
+                const correctionItem = document.createElement('div');
+                correctionItem.className = 'correction-item';
+                
+                correctionItem.innerHTML = `
+                    <div class="question-correction">السؤال ${wrong.questionIndex + 1}: ${wrong.question}</div>
+                    <p><strong>إجابتك:</strong> ${wrong.userAnswer}</p>
+                    <p class="correct-answer"><strong>الإجابة الصحيحة:</strong> ${wrong.correctAnswer}</p>
+                    <div class="explanation"><strong>التوضيح:</strong> ${wrong.explanation}</div>
+                `;
+                
+                correctionsList.appendChild(correctionItem);
+            });
+        }
+
+        // عرض المؤثرات البصرية بناءً على النتيجة
+        function showVisualEffects(percentage) {
+            // إضافة مؤثرات الكونفيتي للنتائج العالية
+            if (percentage >= 80) {
+                createConfetti();
+            }
+            
+            // تأثيرات الاهتزاز للنتائج المنخفضة
+            if (percentage < 50) {
+                resultsContainer.style.animation = 'shake 0.5s ease';
+                setTimeout(() => {
+                    resultsContainer.style.animation = '';
+                }, 500);
+            }
+        }
+
+        // إنشاء تأثير الكونفيتي
+        function createConfetti() {
+            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = `${Math.random() * 100}%`;
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = confetti.style.width;
+                
+                document.querySelector('.container').appendChild(confetti);
+                
+                // تأثير الرسوم المتحركة
+                confetti.animate([
+                    { opacity: 0, transform: 'translateY(-100px) rotate(0deg)' },
+                    { opacity: 1, transform: `translateY(${Math.random() * 500}px) rotate(${Math.random() * 360}deg)` }
+                ], {
+                    duration: 1000 + Math.random() * 2000,
+                    easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+                });
+                
+                // إزالة الكونفيتي بعد الانتهاء من الرسوم المتحركة
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+
+        // إعادة تشغيل الاختبار
+        function restartTest() {
+            // إعادة تعيين المتغيرات
+            currentQuestionIndex = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            score = 0;
+            
+            // إعادة تعيين الواجهة
+            document.getElementById('questions-area').style.display = 'block';
+            document.querySelector('.buttons-container').style.display = 'flex';
+            document.querySelector('.progress-container').style.display = 'block';
+            document.querySelector('.level-indicator').style.display = 'flex';
+            answerMessage.style.display = 'flex';
+            
+            resultsContainer.classList.remove('active');
+            correctionsContainer.classList.remove('active');
+            
+            // إزالة جميع الأسئلة القديمة
+            questionsArea.innerHTML = '';
+            
+            // إزالة جميع الخيارات المعطلة إذا وجدت
+            document.querySelectorAll('.option.disabled').forEach(option => {
+                option.classList.remove('disabled');
+            });
+            
+            // إعادة تهيئة التطبيق
+            initApp();
+        }
+
+        // إضافة مستمعي الأحداث
+        function addEventListeners() {
+            prevBtn.addEventListener('click', goToPrevQuestion);
+            nextBtn.addEventListener('click', goToNextQuestion);
+            submitBtn.addEventListener('click', submitTest);
+            showCorrectionsBtn.addEventListener('click', () => {
+                correctionsContainer.classList.toggle('active');
+                if (correctionsContainer.classList.contains('active')) {
+                    showCorrectionsBtn.innerHTML = '<i class="fas fa-eye-slash"></i> إخفاء التصحيحات';
+                } else {
+                    showCorrectionsBtn.innerHTML = '<i class="fas fa-check-circle"></i> عرض التصحيحات';
+                }
+            });
+            restartBtn.addEventListener('click', restartTest);
+        }
+
+        // بدء التطبيق عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
